@@ -1,0 +1,69 @@
+<html>
+<head>
+ <meta charset="utf-8"/>
+<title>json parser for sched</title>
+</head>
+<body>
+<div>
+<script>
+// a JavaScript object...:
+
+var url = "https://penguicon2019.sched.com/api/session/list?api_key=5ea81a81d7732d9c00787a401fce3d3a&format=json&custom_data=Y";
+var myObj = { };
+
+// ...converted into JSON:
+var myJSON = JSON.stringify(myObj);
+
+// send JSON:
+var xmlhttp = new XMLHttpRequest();
+
+// calculate number of hours....
+// day - 3 to bring the initial index to 0 
+//starttime_index = (24 *(day -3)) + hour     with hour in 24 hour format
+//endtime_index = (24 *(day -3)) + hour
+//duration = endtime_index - starttime_index
+
+
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var myArr = JSON.parse(this.responseText);
+        var aArr = myArr.sort((a, b) => ( a.name.localeCompare(b.name)) )
+        var bArr = aArr.sort((a, b) => ( a.event_type.localeCompare(b.event_type)) ) 
+        
+        thisArr = bArr.sort((a, b) => (a.event_start > b.event_start) ? 1 : -1)
+        // need to sort all day events vs not all day events here
+        myFunction(thisArr);
+
+        //myFunction(myArr);
+    }
+};
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+
+function myFunction(arr) {
+    var out = "";
+    var i;
+    for(i = 0; i < arr.length; i++) {
+        out += '<tr><td>'  + arr[i].event_start +
+               '</td><td>' + arr[i].event_end +
+               '</td><td>' + arr[i].event_type +
+               '</td><td>' + arr[i].venue +
+               '</td><td>' + arr[i].name +
+               '</td><td>' + arr[i].speakers +
+               '</td><td>' + arr[i].description +
+               '<td></tr>';
+    }
+    document.getElementById("testing").innerHTML = out;
+}
+</script>
+<h3>Penguicon Schedule files<h3>
+<h4>all day events are not sorted to the top yet</h4>
+</div>
+<div>
+<table id="testing">
+
+
+</table>
+</div>
+</body>
+</html>
